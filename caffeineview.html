@@ -1,426 +1,1346 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Caffeineview · 서울 카페 뷰 파인더</title>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" as="style" crossorigin
-  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>카페인뷰 · Caffeineview — 뷰 좋은 카페 큐레이션</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Parisienne&family=Space+Grotesk:wght@500;700&family=Noto+Sans+KR:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg-top:#eaf3fb;
-    --bg-bottom:#fff8ef;
-    --ink:#2b2320;
-    --muted:#78716a;
-    --accent:#b9773f;
-    --accent-dark:#8a5a2e;
-    --card-bg:#ffffff;
-    --chip-bg:#f3ede4;
-    --chip-ink:#6b5f52;
-    --line:#eee2d3;
-    --shadow:0 10px 28px rgba(80,55,25,0.09);
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
-    color:var(--ink);
-    background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 55%);
-    min-height:100vh;
-  }
-  .wrap{ max-width:1080px; margin:0 auto; padding:40px 24px 64px; }
-
-  header.hero{ text-align:center; padding:12px 0 28px; }
-  .hero-icons{ font-size:34px; letter-spacing:14px; margin-bottom:6px; }
-  .hero h1{
-    font-size:clamp(28px, 4vw, 40px);
-    margin:0 0 8px;
-    font-weight:800;
-    letter-spacing:-0.02em;
-  }
-  .hero h1 span{ color:var(--accent); }
-  .hero p{ margin:0; color:var(--muted); font-size:15px; }
-
-  .panel{
-    background:var(--card-bg);
-    border:1px solid var(--line);
-    border-radius:20px;
-    box-shadow:var(--shadow);
-    padding:20px 22px;
-    margin-bottom:28px;
-  }
-  .search-row{ display:flex; gap:10px; margin-bottom:16px; }
-  .search-row input{
-    flex:1;
-    border:1px solid var(--line);
-    background:#fbf7ef;
-    border-radius:12px;
-    padding:12px 16px;
-    font-size:14px;
-    font-family:inherit;
-    color:var(--ink);
-    outline:none;
-    transition:border-color .15s;
-  }
-  .search-row input:focus{ border-color:var(--accent); }
-  .filter-label{
-    font-size:12px; font-weight:700; color:var(--muted);
-    margin:14px 0 8px; text-transform:uppercase; letter-spacing:.04em;
-  }
-  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
-  .chip{
-    border:1px solid var(--line);
-    background:var(--chip-bg);
-    color:var(--chip-ink);
-    padding:7px 14px;
-    border-radius:999px;
-    font-size:13px;
-    font-weight:600;
-    cursor:pointer;
-    user-select:none;
-    transition:.15s;
-    white-space:nowrap;
-  }
-  .chip:hover{ border-color:var(--accent); }
-  .chip.active{
-    background:var(--accent);
-    border-color:var(--accent);
-    color:#fff;
+  :root {
+    --ink: #232620;
+    --ink-soft: #6E756A;
+    --cream: #F6F8F1;
+    --card: #FFFFFF;
+    --line: #E1E7DA;
+    --accent: #6E9273;
+    --accent-soft: #E6EFE2;
+    --accent-deep: #45614A;
+    --gold: #D9A85C;
+    --gold-soft: #F6EAD3;
+    --sage: #6E9273;
+    --sage-soft: #E6EFE2;
+    --shadow: 0 12px 30px rgba(35, 38, 32, 0.07);
+    --radius: 18px;
   }
 
-  .result-count{ font-size:13px; color:var(--muted); margin:4px 2px 14px; }
+  * { box-sizing: border-box; }
 
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));
-    gap:18px;
-  }
-  .card{
-    background:var(--card-bg);
-    border:1px solid var(--line);
-    border-radius:18px;
-    padding:20px;
-    box-shadow:var(--shadow);
-    cursor:pointer;
-    transition:transform .15s, box-shadow .15s;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-  }
-  .card:hover{ transform:translateY(-4px); box-shadow:0 16px 34px rgba(80,55,25,0.14); }
-  .card-top{ display:flex; align-items:center; gap:10px; }
-  .card-emoji{
-    font-size:26px;
-    width:44px; height:44px;
-    display:flex; align-items:center; justify-content:center;
-    background:var(--bg-top);
-    border-radius:12px;
-    flex:none;
-  }
-  .card-title{ font-size:16px; font-weight:800; line-height:1.3; }
-  .card-area{ font-size:12px; color:var(--muted); font-weight:600; }
-  .card-desc{ font-size:13.5px; color:#4a433d; line-height:1.55; flex:1; }
-  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; }
-  .tag{
-    font-size:11.5px;
-    background:var(--chip-bg);
-    color:var(--chip-ink);
-    padding:4px 10px;
-    border-radius:999px;
-    font-weight:600;
-  }
-  .card-tip{
-    font-size:12px;
-    color:var(--accent-dark);
-    background:#fbf1e4;
-    border-radius:10px;
-    padding:8px 10px;
-    font-weight:600;
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(ellipse 55% 60% at 8% 8%, rgba(180,205,180,0.35) 0%, transparent 65%),
+      radial-gradient(ellipse 60% 70% at 88% 15%, rgba(111,146,115,0.28) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 55% at 92% 55%, rgba(217,168,92,0.22) 0%, transparent 70%),
+      radial-gradient(ellipse 55% 60% at 4% 60%, rgba(111,146,115,0.18) 0%, transparent 70%),
+      var(--cream);
+    background-attachment: fixed;
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
-  .empty{
-    text-align:center;
-    padding:60px 20px;
-    color:var(--muted);
-    font-size:14px;
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.02em;
   }
 
-  .overlay{
-    display:none;
-    position:fixed; inset:0;
-    background:rgba(30,20,10,0.45);
-    align-items:center; justify-content:center;
-    padding:20px;
-    z-index:50;
-  }
-  .overlay.show{ display:flex; }
-  .modal{
-    background:#fff;
-    border-radius:22px;
-    max-width:480px;
-    width:100%;
-    padding:28px;
-    box-shadow:0 24px 60px rgba(0,0,0,0.25);
-    position:relative;
-  }
-  .modal-close{
-    position:absolute; top:16px; right:18px;
-    border:none; background:none; font-size:20px;
-    cursor:pointer; color:var(--muted);
-  }
-  .modal-emoji{ font-size:38px; margin-bottom:10px; }
-  .modal h2{ margin:0 0 4px; font-size:22px; font-weight:800; }
-  .modal .card-area{ margin-bottom:14px; display:block; }
-  .modal-section{ margin-top:16px; }
-  .modal-section h3{
-    font-size:12px; text-transform:uppercase; letter-spacing:.04em;
-    color:var(--muted); margin:0 0 6px; font-weight:700;
-  }
-  .modal-section p{ margin:0; font-size:14px; line-height:1.6; color:#3d372f; }
+  a { color: inherit; text-decoration: none; }
 
-  footer{
-    text-align:center;
-    color:var(--muted);
-    font-size:12px;
-    margin-top:40px;
-    line-height:1.6;
+  /* ---------- NAV ---------- */
+  .site-header {
+    background:
+      radial-gradient(ellipse 60% 100% at 15% 20%, rgba(180,205,180,0.55) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 90% at 55% 80%, rgba(217,168,92,0.35) 0%, transparent 65%),
+      radial-gradient(ellipse 70% 100% at 90% 30%, rgba(111,146,115,0.4) 0%, transparent 65%),
+      var(--cream);
+    border-bottom: 1px solid var(--line);
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px clamp(20px, 6vw, 64px);
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-deep);
+    display: inline-block;
+  }
+  .nav-tag {
+    font-size: 12px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: clamp(20px, 5vw, 32px) clamp(20px, 6vw, 64px) clamp(28px, 6vw, 48px);
+    position: relative;
+  }
+  .hero-copy { animation: rise 0.7s ease both; }
+  .hero-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .mini-blob {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), transparent 55%),
+      radial-gradient(circle at 65% 70%, rgba(217,168,92,0.55), transparent 60%),
+      radial-gradient(circle at 40% 60%, var(--accent), var(--accent-deep) 80%);
+    filter: blur(0.3px);
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 22px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  h1 {
+    font-family: 'Parisienne', cursive;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(52px, 7.5vw, 78px);
+    line-height: 1.15;
+    margin: 0 0 18px;
+    letter-spacing: 0.01em;
+    color: var(--accent-deep);
+    transform: rotate(-2deg);
+    transform-origin: left bottom;
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--accent-deep);
+  }
+  .sub {
+    font-size: 16.5px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    max-width: 460px;
+    margin: 0 0 32px;
+  }
+  .sub-line {
+    display: block;
+    opacity: 0;
+    animation: subRise 0.6s ease forwards;
+  }
+  .sub-line:nth-child(1) { animation-delay: 0.1s; }
+  .sub-line:nth-child(2) { animation-delay: 0.35s; }
+  .sub-line:nth-child(3) { animation-delay: 0.6s; }
+  @keyframes subRise {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .search-box {
+    display: flex;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 6px;
+    box-shadow: var(--shadow);
+    max-width: 460px;
+  }
+  .search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--ink);
+  }
+  .search-box input::placeholder { color: #B7AB98; }
+  .search-btn {
+    border: none;
+    background: var(--ink);
+    color: #FBF6EE;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 600;
+    font-size: 14.5px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .search-btn:hover { background: var(--accent-deep); }
+  .search-btn:active { transform: scale(0.97); }
+  .search-btn:focus-visible, .search-box input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .quick-tags {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .quick-tag {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.5);
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .quick-tag:hover { border-color: var(--accent); color: var(--accent); }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---------- 오른쪽 여백 데코 아이콘 (데스크탑 전용) ---------- */
+  .hero-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+  .side-icons {
+    position: absolute;
+    right: clamp(16px, 4.5vw, 70px);
+    top: 90px;
+    display: none;
+    width: 210px;
+    z-index: 5;
+  }
+  .side-illustration {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .reveal {
+    opacity: 0;
+    animation: sideIconDrop 0.7s ease forwards;
+  }
+  .reveal.r1 { animation-delay: 0.3s; }
+  .reveal.r2 { animation-delay: 0.75s; }
+  .reveal.r3 { animation-delay: 1.2s; }
+  @keyframes sideIconDrop {
+    from { opacity: 0; transform: translateY(-22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @media (min-width: 1180px) {
+    .side-icons { display: block; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-copy, .card { animation: none !important; }
+    .sub-line, .reveal { animation: none !important; opacity: 1 !important; transform: none !important; }
+  }
+
+  /* ---------- COMPACT FEATURE LIST (히어로 내부) ---------- */
+  .feature-inline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 26px;
+  }
+  .feature-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+  .feature-inline .fdot {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .feature-inline:nth-child(1) .fdot { background: var(--accent-soft); }
+  .feature-inline:nth-child(2) .fdot { background: var(--gold-soft); }
+  .feature-inline:nth-child(3) .fdot { background: var(--sage-soft); }
+  .feature-inline b { color: var(--ink); font-weight: 700; }
+
+  /* ---------- DEMO / RESULTS ---------- */
+  .demo {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 6vw, 64px) clamp(64px, 9vw, 96px);
+  }
+  .demo-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 16px;
+  }
+  .demo-head h2 {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 21px;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .demo-head .region-label {
+    color: var(--accent);
+  }
+  .demo-head .count {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+
+  .cards-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cards-viewport {
+    flex: 1;
+    overflow: hidden;
+  }
+  .cards-track {
+    display: flex;
+    transition: transform 0.4s ease;
+  }
+  .cards-page {
+    min-width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .nav-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--card);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    flex-shrink: 0;
+    transition: background 0.15s ease, opacity 0.15s ease;
+  }
+  .nav-btn:hover:not(:disabled) { background: var(--accent-soft); border-color: var(--accent); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--line);
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+    border: none;
+    padding: 0;
+  }
+  .dot.active { background: var(--accent); transform: scale(1.35); }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ink-soft);
+    font-size: 14px;
+    line-height: 1.8;
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+    background: var(--card);
+  }
+  .empty-state b { color: var(--accent-deep); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: cardIn 0.5s ease forwards;
+  }
+  @keyframes cardIn { to { opacity: 1; transform: translateY(0); } }
+
+  .card-view {
+    height: 104px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-view svg { width: 100%; height: 100%; display: block; }
+  .card-view .tag {
+    position: absolute;
+    top: 9px;
+    left: 9px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(30,27,24,0.55);
+    padding: 4px 10px;
+    border-radius: 999px;
+    backdrop-filter: blur(2px);
+  }
+  .card-body { padding: 13px 16px 14px; }
+  .card-body .name {
+    font-weight: 700;
+    font-size: 15.5px;
+    margin-bottom: 3px;
+  }
+  .card-body .addr {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 5px;
+  }
+  .meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11.5px;
+    color: #A69F93;
+    margin-bottom: 9px;
+  }
+  .meta-row .map-link {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 11.5px;
+  }
+  .meta-row .map-link:hover { text-decoration: underline; }
+  .menu-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 9px;
+  }
+  .menu-chip {
+    font-size: 11px;
+    background: var(--gold-soft);
+    color: #8A5E1E;
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .rating {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 9px;
+  }
+  .rating .star { color: var(--gold); }
+  .review-count { color: #A69F93; font-size: 11.5px; }
+  .rating.verified { display: flex; align-items: center; }
+  .verified-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent-deep);
+    background: var(--accent-soft);
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .hotspot {
+    border-top: 1px dashed var(--line);
+    padding-top: 9px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    display: flex;
+    gap: 6px;
+  }
+  .hotspot b { color: var(--sage); font-weight: 700; }
+
+  /* ---------- FOOTER ---------- */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 26px clamp(20px, 6vw, 64px) 34px;
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 860px) {
+    .cards-page { grid-template-columns: 1fr; }
+    h1 { font-size: 46px; }
+  }
+  @media (max-width: 480px) {
+    .search-box { flex-direction: column; }
+    .search-btn { width: 100%; }
+    nav { padding: 18px 18px; }
+    .hero, .demo { padding-left: 18px; padding-right: 18px; }
+  }
+
+  /* ---------- CAFE DETAIL MODAL ---------- */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(30, 27, 24, 0.55);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-card {
+    background: var(--card);
+    border-radius: 20px;
+    max-width: 480px;
+    width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+    animation: modalIn 0.25s ease both;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.85);
+    font-size: 15px;
+    cursor: pointer;
+    z-index: 2;
+    color: var(--ink);
+  }
+  .modal-scene {
+    position: relative;
+    height: 160px;
+  }
+  .modal-scene svg { width: 100%; height: 100%; display: block; }
+  .modal-scene .tag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(30,27,24,0.55);
+    padding: 4px 11px;
+    border-radius: 999px;
+  }
+  .modal-body { padding: 20px 22px 24px; }
+  .modal-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .modal-title-row h3 {
+    font-size: 19px;
+    font-weight: 800;
+    margin: 0;
+  }
+  .modal-row {
+    display: flex;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13.5px;
+  }
+  .modal-row:last-of-type { border-bottom: none; }
+  .modal-label {
+    flex-shrink: 0;
+    width: 68px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+  }
+  .modal-unknown { color: #B0A89C; font-style: italic; }
+  .modal-map-link {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--accent-deep);
+    padding: 10px 16px;
+    border-radius: 10px;
   }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header class="hero">
-    <div class="hero-icons">☕ 🍰 📸</div>
-    <h1><span>Caffeineview</span> · 서울 카페 뷰 파인더</h1>
-    <p>사진 찍기 좋은 뷰, 오늘은 어디서 커피 한 잔 할까요?</p>
-  </header>
+<header class="site-header">
+  <nav>
+    <div class="logo"><span class="dot"></span>caffeineview</div>
+    <div class="nav-tag mono">SEOUL · CAFE VIEW FINDER</div>
+  </nav>
+</header>
 
-  <div class="panel">
-    <div class="search-row">
-      <input id="search" type="text" placeholder="카페, 동네, '노을', '야경' 같은 키워드로 검색해보세요" />
+<div class="hero-wrap">
+<section class="hero">
+  <div class="hero-copy">
+    <div class="hero-badge">
+      <span class="mini-blob" aria-hidden="true"></span>
+      <span class="eyebrow">Seoul · Cafe View Guide</span>
+    </div>
+    <h1>Caffeineview</h1>
+    <p class="sub">
+      <span class="sub-line">지역만 입력하면</span>
+      <span class="sub-line">뷰 좋은 카페와 인기 메뉴, 근처 핫스팟까지</span>
+      <span class="sub-line">정리해서 보여드려요</span>
+    </p>
+
+    <div class="feature-inline-list">
+      <div class="feature-inline"><span class="fdot">🌇</span><span><b>뷰 좋은 카페 추천</b> — 한강뷰, 루프탑, 숲뷰까지 골라서</span></div>
+      <div class="feature-inline"><span class="fdot">☕</span><span><b>인기 메뉴 안내</b> — 그 카페에서 가장 사랑받는 메뉴</span></div>
+      <div class="feature-inline"><span class="fdot">📍</span><span><b>근처 핫스팟</b> — 전시·소품샵·산책로까지 한 번에</span></div>
     </div>
 
-    <div class="filter-label">지역</div>
-    <div class="chips" id="areaChips"></div>
-
-    <div class="filter-label">뷰 타입</div>
-    <div class="chips" id="typeChips"></div>
+    <div class="search-box">
+      <input id="regionInput" type="text" placeholder="지역을 입력해보세요 (예: 성수동)" />
+      <button class="search-btn" id="searchBtn">뷰 좋은 카페 찾기 →</button>
+    </div>
+    <div class="quick-tags">
+      <span class="quick-tag" data-region="성수동">성수동</span>
+      <span class="quick-tag" data-region="한남동">한남동</span>
+      <span class="quick-tag" data-region="홍대">홍대</span>
+      <span class="quick-tag" data-region="북한산">북한산</span>
+      <span class="quick-tag" data-region="남산">남산</span>
+      <span class="quick-tag" data-region="강남역">강남역</span>
+      <span class="quick-tag" data-region="을지로">을지로</span>
+      <span class="quick-tag" data-region="서촌">서촌</span>
+      <span class="quick-tag" data-region="북촌">북촌</span>
+      <span class="quick-tag" data-region="반포">반포</span>
+    </div>
   </div>
+</section>
 
-  <div class="result-count" id="resultCount"></div>
-  <div class="grid" id="grid"></div>
-  <div class="empty" id="emptyState" style="display:none;">😶 조건에 맞는 카페가 없어요. 필터를 바꿔보세요.</div>
+<div class="side-icons" aria-hidden="true">
+  <svg class="side-illustration" viewBox="0 0 260 520" xmlns="http://www.w3.org/2000/svg">
 
-  <footer>
-    소개된 장소는 서울에서 널리 알려진 '뷰 맛집' 동네·명소를 바탕으로 소개하는 참고 정보이며,<br/>
-    실제 방문 전에는 영업시간과 최신 정보를 다시 확인해주세요. ☕
-  </footer>
+    <!-- 1. 커피컵 -->
+    <g transform="translate(-14,0) rotate(-3 120 100)">
+      <g class="reveal r1">
+        <!-- 접시 -->
+        <ellipse cx="120" cy="150" rx="78" ry="13" fill="#E7E2D8"/>
+        <ellipse cx="120" cy="146" rx="78" ry="13" fill="#F5F1E8"/>
+        <ellipse cx="120" cy="146" rx="50" ry="7" fill="#E7E2D8"/>
+        <!-- 컵 몸통 -->
+        <path d="M62 66 H166 L158 118 Q158 136 114 136 Q70 136 70 118 Z" fill="#FBF8F2"/>
+        <path d="M62 66 H166 L164 78 H64 Z" fill="#EFE9DC"/>
+        <!-- 커피 액체 -->
+        <ellipse cx="114" cy="70" rx="50" ry="9" fill="#3B2418"/>
+        <ellipse cx="114" cy="68.5" rx="50" ry="8" fill="#5A3825"/>
+        <!-- 손잡이 -->
+        <path d="M164 76 Q198 78 195 102 Q192 122 166 116" fill="none" stroke="#EFE9DC" stroke-width="10" stroke-linecap="round"/>
+        <path d="M164 76 Q198 78 195 102 Q192 122 166 116" fill="none" stroke="#DDD5C4" stroke-width="10" stroke-linecap="round" opacity="0.35"/>
+        <!-- 스팀 -->
+        <g stroke="#B7BFC6" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0.8">
+          <path d="M96 54 C89 44 101 38 94 26"/>
+          <path d="M116 54 C109 44 121 38 114 26"/>
+          <path d="M136 54 C129 44 141 38 134 26"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- 2. 케이크 (딸기 쇼트케이크 조각) -->
+    <g transform="translate(38,192) rotate(4 120 100)">
+      <g class="reveal r2">
+        <ellipse cx="120" cy="152" rx="80" ry="11" fill="var(--line)" opacity="0.5"/>
+        <!-- 케이크 옆면 (사다리꼴 조각) -->
+        <path d="M66 148 L74 62 Q120 46 166 62 L174 148 Z" fill="#FFF7E6"/>
+        <!-- 스펀지/크림 층 (클리핑으로 정리) -->
+        <clipPath id="cakeClip2">
+          <path d="M66 148 L74 62 Q120 46 166 62 L174 148 Z"/>
+        </clipPath>
+        <g clip-path="url(#cakeClip2)">
+          <rect x="60" y="46" width="120" height="26" fill="#FFF7E6"/>
+          <rect x="60" y="72" width="120" height="26" fill="#F6C86B"/>
+          <rect x="60" y="98" width="120" height="14" fill="#FFF7E6"/>
+          <rect x="60" y="112" width="120" height="26" fill="#F6C86B"/>
+          <rect x="60" y="138" width="120" height="14" fill="#FFF7E6"/>
+        </g>
+        <path d="M66 148 L74 62 Q120 46 166 62 L174 148 Z" fill="none" stroke="#EAD9B8" stroke-width="2"/>
+        <!-- 딸기 -->
+        <g transform="translate(120,44)">
+          <path d="M0 -4 C10 -4 14 6 8 14 C4 20 -4 20 -8 14 C-14 6 -10 -4 0 -4 Z" fill="#E5484D"/>
+          <g fill="#FBD7D7" opacity="0.8">
+            <circle cx="-3" cy="8" r="1.3"/><circle cx="3" cy="10" r="1.3"/><circle cx="0" cy="14" r="1.3"/>
+          </g>
+          <path d="M-5 -6 Q0 -14 5 -6 Q0 -9 -5 -6 Z" fill="#4C9A4C"/>
+        </g>
+        <!-- 접시 받침 -->
+        <rect x="58" y="146" width="124" height="9" rx="4" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+      </g>
+    </g>
+
+    <!-- 3. 카메라 (이모지 스타일) -->
+    <g transform="translate(-8,378) rotate(-4 120 80)">
+      <g class="reveal r3">
+        <ellipse cx="120" cy="140" rx="66" ry="10" fill="var(--line)" opacity="0.45"/>
+        <!-- 카메라 몸통 -->
+        <rect x="52" y="46" width="136" height="82" rx="16" fill="#2B2E33"/>
+        <rect x="52" y="46" width="136" height="82" rx="16" fill="none" stroke="#3F444B" stroke-width="2"/>
+        <!-- 뷰파인더 -->
+        <rect x="66" y="30" width="30" height="18" rx="4" fill="#2B2E33"/>
+        <!-- 다이얼/버튼 -->
+        <circle cx="164" cy="34" r="9" fill="#3F444B"/>
+        <circle cx="164" cy="34" r="4" fill="#5A6069"/>
+        <circle cx="60" cy="60" r="6" fill="#D9A85C"/>
+        <!-- 렌즈 -->
+        <circle cx="120" cy="90" r="38" fill="#4A5560"/>
+        <circle cx="120" cy="90" r="27" fill="#232830"/>
+        <circle cx="120" cy="90" r="16" fill="#3B4650"/>
+        <circle cx="110" cy="80" r="6" fill="#8FA3B0" opacity="0.6"/>
+        <!-- 플래시 반짝임 -->
+        <g fill="var(--gold)" opacity="0.9">
+          <path d="M184 34 L188 44 L198 46 L188 50 L184 60 L180 50 L170 46 L180 44 Z"/>
+        </g>
+      </g>
+    </g>
+  </svg>
+</div>
 </div>
 
-<div class="overlay" id="overlay">
-  <div class="modal" id="modal"></div>
+<section class="demo" id="demoSection" style="display:none;">
+  <div class="demo-head">
+    <h2><span class="region-label" id="regionLabel">성수동</span> 추천 결과</h2>
+    <span class="count mono" id="resultCount">3 RESULTS</span>
+  </div>
+  <div class="cards-wrap" id="cardsWrap">
+    <button class="nav-btn" id="prevBtn" aria-label="이전 카페 보기">‹</button>
+    <div class="cards-viewport" id="cardsViewport">
+      <div class="cards-track" id="cardsTrack"></div>
+    </div>
+    <button class="nav-btn" id="nextBtn" aria-label="다음 카페 보기">›</button>
+  </div>
+  <div class="dots" id="dotsWrap"></div>
+  <div class="empty-state" id="emptyState" style="display:none;">
+    아직 <b id="emptyRegion"></b> 데이터는 준비 중이에요.<br>
+    <span class="mono">성수동 · 한남동 · 홍대 · 북한산 · 남산 · 강남역 · 을지로 · 서촌 · 북촌 · 반포</span> 중에서 먼저 찾아보시겠어요?
+  </div>
+</section>
+
+<footer>
+  <span>caffeineview — 뷰 좋은 카페를 찾는 가장 짧은 길</span>
+  <span class="mono">SEOUL, KR</span>
+</footer>
+
+<div class="modal-overlay" id="cafeModal">
+  <div class="modal-card">
+    <button class="modal-close" id="modalCloseBtn" aria-label="닫기">✕</button>
+    <div id="modalContent"></div>
+  </div>
 </div>
 
 <script>
-const CAFES = [
-  {
-    name: "산모퉁이", area: "부암동", areaGroup: "부암동·평창동",
-    type: "산·숲뷰", emoji: "🏞️",
-    tags: ["인왕산 전망", "숨은 명소", "드라마 촬영지"],
-    desc: "인왕산 자락 언덕 위에 자리해 부암동 골목과 능선이 한눈에 내려다보이는 대표적인 조망 카페.",
-    tip: "해질 무렵 창가 자리에서 노을과 골목 풍경이 함께 담겨요.",
-    bestTime: "일몰 30분 전"
-  },
-  {
-    name: "클럽에스프레소", area: "부암동", areaGroup: "부암동·평창동",
-    type: "산·숲뷰", emoji: "🌳",
-    tags: ["조용한 정원", "능선뷰"],
-    desc: "정원과 테라스에서 북한산·인왕산 능선을 조망할 수 있는, 오래된 단골이 많은 조용한 카페.",
-    tip: "평일 오전 방문 시 한적하게 정원 사진을 남길 수 있어요.",
-    bestTime: "평일 오전"
-  },
-  {
-    name: "낙산 성곽길 카페거리", area: "이화동·낙산공원", areaGroup: "낙산·대학로",
-    type: "도심·야경뷰", emoji: "🌃",
-    tags: ["서울 성곽", "야경", "도심 전망"],
-    desc: "낙산공원 성곽을 따라 늘어선 카페들에서 종로·동대문 일대 도심 야경을 내려다볼 수 있어요.",
-    tip: "성곽 위에서 카페 조명과 도심 야경을 함께 프레임에 담아보세요.",
-    bestTime: "해가 진 직후"
-  },
-  {
-    name: "서울숲 리버뷰 카페", area: "성수동", areaGroup: "성수동",
-    type: "강·숲뷰", emoji: "🌉",
-    tags: ["통유리창", "숲과 강"],
-    desc: "서울숲의 초록과 한강이 함께 시야에 들어오는 통유리 통창 좌석이 특징인 카페.",
-    tip: "창가 2층 자리가 숲과 강을 동시에 담기 좋아요.",
-    bestTime: "오후 3~5시"
-  },
-  {
-    name: "뚝섬 한강공원 인근 카페", area: "성수동·뚝섬", areaGroup: "성수동",
-    type: "한강뷰", emoji: "🌇",
-    tags: ["노을 명소", "루프탑"],
-    desc: "뚝섬 한강공원 자벌레 전망대 인근, 노을 시간대 인생샷 명소로 꼽히는 한강뷰 카페들이 모여 있어요.",
-    tip: "노을이 물드는 시간, 한강과 다리 실루엣을 배경으로 담아보세요.",
-    bestTime: "일몰 시간"
-  },
-  {
-    name: "이촌 한강 카페거리", area: "이촌동", areaGroup: "한강변",
-    type: "한강뷰", emoji: "🌊",
-    tags: ["반포대교 조망", "야경"],
-    desc: "반포대교 무지개 분수와 한강 야경을 감상할 수 있는 강변 산책로변 카페들.",
-    tip: "분수쇼 시간에 맞춰 방문하면 창밖 풍경이 더 화려해요.",
-    bestTime: "저녁 분수쇼 시간"
-  },
-  {
-    name: "여의도 한강공원 카페", area: "여의도", areaGroup: "한강변",
-    type: "한강뷰", emoji: "🏙️",
-    tags: ["63빌딩", "노을", "탁 트인 시야"],
-    desc: "63빌딩과 마포대교를 배경으로 한강이 넓게 펼쳐지는, 탁 트인 뷰가 매력적인 구간.",
-    tip: "노을과 63빌딩이 함께 보이는 서쪽 창가 자리를 추천해요.",
-    bestTime: "일몰 무렵"
-  },
-  {
-    name: "한남동 옥상 카페", area: "한남동", areaGroup: "한남동·이태원",
-    type: "루프탑", emoji: "🧗",
-    tags: ["남산타워 조망", "옥상 정원"],
-    desc: "골목 안 건물 옥상에 자리해 남산타워와 도심 스카이라인을 함께 즐길 수 있는 루프탑 카페.",
-    tip: "저녁에는 남산타워 조명이 켜져 야경 사진이 더 예뻐요.",
-    bestTime: "해질녘~초저녁"
-  },
-  {
-    name: "경리단길 루프탑", area: "이태원·경리단길", areaGroup: "한남동·이태원",
-    type: "루프탑", emoji: "🍹",
-    tags: ["골목뷰", "이국적 분위기"],
-    desc: "언덕진 골목 위 루프탑에서 이태원 특유의 이국적인 거리 풍경을 내려다볼 수 있어요.",
-    tip: "낮에는 파스텔톤 골목, 밤에는 알록달록한 간판 불빛이 포인트.",
-    bestTime: "낮 또는 초저녁"
-  },
-  {
-    name: "남산 소월길 카페", area: "회현동·소월길", areaGroup: "낙산·대학로",
-    type: "도심·야경뷰", emoji: "🗼",
-    tags: ["서울 전경", "야경"],
-    desc: "남산으로 오르는 소월길 언덕에서 서울 도심 전경을 시원하게 내려다볼 수 있는 카페들.",
-    tip: "차가 많은 낮보다 조명이 켜지는 밤 풍경이 훨씬 인상적이에요.",
-    bestTime: "야간"
-  },
-  {
-    name: "연남동 경의선숲길 카페", area: "연남동", areaGroup: "연남동",
-    type: "산·숲뷰", emoji: "🌿",
-    tags: ["숲길뷰", "감성 산책로"],
-    desc: "기다란 경의선숲길을 따라 초록빛 산책로가 통창 너머로 펼쳐지는 감성 카페 거리.",
-    tip: "숲길과 나란히 난 창가 자리가 사진 담기 가장 좋아요.",
-    bestTime: "오전~낮"
-  },
-  {
-    name: "서촌 옥상카페", area: "서촌·통인동", areaGroup: "북촌·서촌",
-    type: "도심·전통뷰", emoji: "🏯",
-    tags: ["기와지붕", "인왕산", "전통 골목"],
-    desc: "낮은 한옥 지붕들과 인왕산이 어우러진 옛 정취를 옥상에서 내려다볼 수 있는 카페.",
-    tip: "기와지붕 라인을 따라 인왕산이 함께 담기는 구도를 추천해요.",
-    bestTime: "오후"
-  },
-  {
-    name: "북한산 자락 카페", area: "평창동·구기동", areaGroup: "부암동·평창동",
-    type: "산·숲뷰", emoji: "⛰️",
-    tags: ["북한산 조망", "탁 트인 정원"],
-    desc: "북한산 능선을 정면으로 마주하는 넓은 정원형 카페들이 모여 있는 조용한 동네.",
-    tip: "맑은 날 오전, 능선이 가장 선명하게 보여요.",
-    bestTime: "맑은 날 오전"
+  const DATA = {
+    "성수동": [
+      { name: "루프탑 온더힐", view: "루프탑뷰", address: "서울 성동구 연무장길 7", walk: "도보 5분", menu: ["시그니처 라떼", "바스크 치즈케이크"], rating: 4.8, reviews: 297, hotspot: "성수 소품샵 거리 · 오어스 팝업 (~7/12)" },
+      { name: "글라스가든", view: "정원뷰", address: "서울 성동구 아차산로9길 24", walk: "도보 8분", menu: ["콜드브루", "크로플"], rating: 4.6, reviews: 228, hotspot: "서울숲 산책로 · 피스마이너스원×토이스토리 팝업 (~8/31)" },
+      { name: "브릭앤뷰", view: "스카이라인뷰", address: "서울 성동구 성수이로 88", walk: "도보 3분", menu: ["플랫화이트", "티라미수"], rating: 4.7, reviews: 205, hotspot: "연무장길 팝업거리 · T1 암행천문 팝업 (~9/13)" },
+      { name: "아카이브 서울", view: "루프탑뷰", address: "서울 성동구 왕십리로4길 26-7, 5F", menu: ["와인", "이색 요리"], hotspot: "서울숲" },
+      { name: "orer(오레르)", view: "정원뷰", address: "서울 성동구 연무장길 18", menu: ["시즌 디저트(오드 투 스윗 연계)"], hours: "매일 11:00~23:00", hotspot: "성수 소품샵 거리" },
+      { name: "텅플래닛", view: "창가뷰", address: "서울 성동구 성수이로 82, 2층", menu: ["에스프레소", "텅 레이어드 케이크"], hours: "매일 13:00~22:00", hotspot: "성수동 카페거리" }
+    ],
+    "한남동": [
+      { name: "리버사이드 한남", view: "한강뷰", address: "서울 용산구 한남대로27길 12", walk: "도보 6분", menu: ["핸드드립", "레몬 파운드"], rating: 4.9, reviews: 244, hotspot: "한강 산책로" },
+      { name: "마하 한남", view: "한강뷰", address: "서울 용산구 서빙고로91나길 85, 4층", menu: ["카페 음료"], hotspot: "한강진역 앤틱거리" },
+      { name: "뮤제카페", view: "정원뷰", address: "서울 용산구 이태원로54길 9", walk: "도보 9분", menu: ["에스프레소", "마카롱"], rating: 4.6, reviews: 206, hotspot: "리움미술관 · <다른 공간 안으로> 전 (~11/29)" },
+      { name: "한남브릭", view: "스카이라인뷰", address: "서울 용산구 독서당로 29", walk: "도보 5분", menu: ["콜드브루", "피스타치오 크로플"], rating: 4.5, reviews: 219, hotspot: "한남동 앤틱거리" },
+      { name: "루프뷰한남", view: "루프탑뷰", address: "서울 용산구 한남대로20길 8", walk: "도보 7분", menu: ["아이스 라떼", "바스크 치즈케이크"], rating: 4.6, reviews: 208, hotspot: "한남 소품샵 거리" },
+      { name: "가든한남", view: "정원뷰", address: "서울 용산구 회나무로13가길 6", walk: "도보 3분", menu: ["핸드드립", "얼그레이 파운드"], rating: 4.7, reviews: 204, hotspot: "디뮤지엄" }
+    ],
+    "홍대": [
+      { name: "루프톱 900", view: "도심뷰", address: "서울 마포구 홍익로 5", walk: "도보 2분", menu: ["아이스 아메리카노", "와플"], rating: 4.4, reviews: 176, hotspot: "홍대 걷고싶은거리 · AK플라자 체인소맨 팝업" },
+      { name: "스튜디오뷰", view: "스트릿뷰", address: "서울 마포구 어울마당로 35", walk: "도보 5분", menu: ["오트라떼", "쿠키"], rating: 4.5, reviews: 212, hotspot: "연트럴파크" },
+      { name: "코너 라이트", view: "창가뷰", address: "서울 마포구 와우산로29길 14", walk: "도보 3분", menu: ["콜드브루", "치즈케이크"], rating: 4.3, reviews: 112, hotspot: "홍대 벽화거리" },
+      { name: "메자닌홍대", view: "창가뷰", address: "서울 마포구 잔다리로 42", walk: "도보 4분", menu: ["플랫화이트", "치즈타르트"], rating: 4.3, reviews: 121, hotspot: "홍대 놀이터" },
+      { name: "빈브라더스 커피하우스 서울", view: "한강뷰", address: "서울 마포구 토정로9길 2, 6~7층", menu: ["핸드드립 커피"], hotspot: "상수동 한강공원" },
+      { name: "카페진정성 한강점", view: "한강뷰", address: "서울 마포구 토정로 128, 서강8경빌딩 5층", menu: ["티", "커피"], hotspot: "선유도공원" }
+    ],
+    "북한산": [
+      { name: "마운틴사이드", view: "산뷰", address: "서울 강북구 우이동길 21", walk: "도보 12분", menu: ["따뜻한 라떼", "단호박식빵"], rating: 4.8, reviews: 294, hotspot: "북한산 둘레길" },
+      { name: "카페 309", view: "탁 트인 뷰", address: "서울 은평구 의상봉길 56-16, 의상빌딩 1~3층", menu: ["베이커리류", "커피"], hours: "10:00~20:00", hotspot: "북한산둘레길" },
+      { name: "클리어스카이", view: "탁 트인 뷰", address: "서울 강북구 북한산로 45", walk: "도보 15분", menu: ["아메리카노", "약과라떼"], rating: 4.6, reviews: 224, hotspot: "정상 전망 포인트" },
+      { name: "숲속다락", view: "숲뷰", address: "서울 강북구 삼양로 173", walk: "도보 10분", menu: ["대추차", "호떡"], rating: 4.6, reviews: 234, hotspot: "북한산 계곡길" },
+      { name: "정상카페", view: "탁 트인 뷰", address: "서울 강북구 북한산로 88", walk: "도보 18분", menu: ["아메리카노", "단팥빵"], rating: 4.7, reviews: 240, hotspot: "백운대 전망대" },
+      { name: "산책로카페", view: "산뷰", address: "서울 강북구 우이동길 45", walk: "도보 9분", menu: ["유자차", "약과"], rating: 4.5, reviews: 167, hotspot: "우이령길" }
+    ],
+    "남산": [
+      { name: "남산클라우드", view: "탁 트인 뷰", address: "서울 용산구 소월길 3", walk: "도보 6분", menu: ["핫초코", "애플파이"], rating: 4.8, reviews: 296, hotspot: "남산 케이블카 승강장" },
+      { name: "눕 카페", view: "탁 트인 뷰", address: "서울 용산구 신흥로26길, 해방타워 5층", menu: ["카페 음료"], hours: "매일 10:00~04:00", hotspot: "해방촌" },
+      { name: "N타워사이드", view: "도심뷰", address: "서울 용산구 남산공원길 105", walk: "도보 3분", menu: ["에스프레소", "초코케이크"], rating: 4.7, reviews: 266, hotspot: "N서울타워 전망대" },
+      { name: "소월길가든", view: "정원뷰", address: "서울 용산구 소월길 45", walk: "도보 8분", menu: ["허브티", "스콘"], rating: 4.5, reviews: 218, hotspot: "남산 예장공원" },
+      { name: "팔각정뷰", view: "탁 트인 뷰", address: "서울 중구 삼일대로 231", walk: "도보 12분", menu: ["유자차", "약과"], rating: 4.6, reviews: 176, hotspot: "남산 팔각정" },
+      { name: "쉘터 서울점", view: "루프탑뷰", address: "서울 용산구 신흥로11길 49-12, 3층", menu: ["해방프레소", "쉘터소금커피"], hotspot: "해방촌 신흥시장" }
+    ],
+    "강남역": [
+      { name: "강남스카이라운지", view: "스카이라인뷰", address: "서울 강남구 강남대로 396", walk: "도보 4분", menu: ["아메리카노", "크루아상"], rating: 4.5, reviews: 153, hotspot: "강남역 지하상가" },
+      { name: "메리가든 루프탑 카페", view: "스카이라인뷰", address: "서울 강남구 봉은사로 113, 디자이너스 호텔 13층", menu: ["스파이시 크림 리조또", "랍스터 로제 파스타"], hours: "11:00~18:00 (이후 라운지바 전환)", closed: "일요일", hotspot: "신논현역 영동시장" },
+      { name: "강남루프탑", view: "루프탑뷰", address: "서울 강남구 봉은사로 108", walk: "도보 5분", menu: ["모히토모크텔", "치즈케이크"], rating: 4.6, reviews: 190, hotspot: "강남대로 야경거리" },
+      { name: "스트릿810", view: "스트릿뷰", address: "서울 강남구 강남대로102길 12", walk: "도보 3분", menu: ["플랫화이트", "마카롱"], rating: 4.3, reviews: 128, hotspot: "강남역 11번 출구 거리" },
+      { name: "윈도우강남", view: "창가뷰", address: "서울 강남구 역삼로 156", walk: "도보 7분", menu: ["디카페인 라떼", "와플"], rating: 4.4, reviews: 215, hotspot: "신논현 먹자골목" },
+      { name: "어반플랜트 한남대교점", view: "한강뷰", address: "서울 강남구 강남대로 708 (한남대교 남단 동편)", menu: ["브런치", "티"], hours: "매일 10:00~22:00", hotspot: "잠원한강공원" }
+    ],
+    "을지로": [
+      { name: "을지다락", view: "창가뷰", address: "서울 중구 을지로15길 6", walk: "도보 4분", menu: ["핸드드립", "인절미라떼"], rating: 4.6, reviews: 241, hotspot: "을지로 노가리골목" },
+      { name: "인쇄소카페", view: "스트릿뷰", address: "서울 중구 수표로 12", walk: "도보 3분", menu: ["콜드브루", "마들렌"], rating: 4.5, reviews: 200, hotspot: "을지로 인쇄골목" },
+      { name: "을지루프", view: "루프탑뷰", address: "서울 중구 청계천로 100", walk: "도보 6분", menu: ["에스프레소", "티라미수"], rating: 4.7, reviews: 212, hotspot: "청계천 산책로" },
+      { name: "챔프커피 제3작업실", view: "루프탑뷰", address: "서울 중구 을지로 157, 세운상가 3층", menu: ["챔프커피", "핸드드립"], hours: "매일 11:30~20:00", hotspot: "세운상가 옥상전망대" },
+      { name: "헤이든을지", view: "스카이라인뷰", address: "서울 중구 을지로 253", walk: "도보 8분", menu: ["콜드브루", "바스크 치즈케이크"], rating: 4.5, reviews: 158, hotspot: "동대문디자인플라자(DDP)" },
+      { name: "청시행", view: "탁 트인 뷰", address: "서울 중구 을지로11길 14", menu: ["수제버거"], hours: "평일 11:00~22:00 (브레이크 15:00~16:00), 토 11:00~24:00", closed: "일요일", hotspot: "을지로 노가리골목" }
+    ],
+    "서촌": [
+      { name: "서촌마루", view: "정원뷰", address: "서울 종로구 자하문로7길 12", walk: "도보 5분", menu: ["유자차", "인절미토스트"], rating: 4.7, reviews: 278, hotspot: "통인시장" },
+      { name: "창가서촌", view: "창가뷰", address: "서울 종로구 필운대로 34", walk: "도보 4분", menu: ["핸드드립", "스콘"], rating: 4.6, reviews: 177, hotspot: "이상의 집" },
+      { name: "골목뷰서촌", view: "스트릿뷰", address: "서울 종로구 자하문로 12", walk: "도보 3분", menu: ["콜드브루", "마카롱"], rating: 4.5, reviews: 177, hotspot: "서촌 골목시장" },
+      { name: "경복궁뷰", view: "탁 트인 뷰", address: "서울 종로구 필운대로1길 3", walk: "도보 6분", menu: ["아메리카노", "약과"], rating: 4.8, reviews: 301, hotspot: "경복궁 서측 담장길" },
+      { name: "대낮한옥", view: "정원뷰", address: "서울 종로구 누하동 165", walk: "도보 8분", menu: ["오미자차", "다과"], rating: 4.6, reviews: 191, hotspot: "누하동 한옥거리" },
+      { name: "인왕산 대충유원지", view: "탁 트인 뷰", address: "서울 종로구 필운대로 46, 4층", menu: ["크림브륄레", "버터 곶감말이"], hotspot: "서촌 통인시장" }
+    ],
+    "북촌": [
+      { name: "북촌한옥뷰", view: "정원뷰", address: "서울 종로구 계동길 8", walk: "도보 4분", menu: ["유자차", "약과"], rating: 4.8, reviews: 240, hotspot: "북촌한옥마을 계동길" },
+      { name: "창덕궁뷰", view: "탁 트인 뷰", address: "서울 종로구 율곡로 84", walk: "도보 6분", menu: ["핸드드립", "인절미라떼"], rating: 4.7, reviews: 239, hotspot: "창덕궁 돌담길" },
+      { name: "삼청동창가", view: "창가뷰", address: "서울 종로구 삼청로 102", walk: "도보 5분", menu: ["콜드브루", "마카롱"], rating: 4.6, reviews: 237, hotspot: "삼청동길" },
+      { name: "북촌스트릿", view: "스트릿뷰", address: "서울 종로구 북촌로 15", walk: "도보 3분", menu: ["아메리카노", "스콘"], rating: 4.5, reviews: 168, hotspot: "북촌 8경" },
+      { name: "가회동가든", view: "정원뷰", address: "서울 종로구 가회동 30", walk: "도보 7분", menu: ["오미자차", "다과세트"], rating: 4.7, reviews: 273, hotspot: "가회동 한옥거리" },
+      { name: "트마리", view: "루프탑뷰", address: "서울 종로구 서순라길 107-1", menu: ["치즈케이크", "문경 오미자 에이드"], hotspot: "종묘" }
+    ],
+    "반포": [
+      { name: "노을카페", view: "한강뷰", address: "서울 동작구 동작대로 335 (동작대교 남단 서편)", menu: ["티", "디저트"], hours: "월~목 10:00~23:00, 금~일 10:00~익일01:00", hotspot: "서래섬" },
+      { name: "스타벅스 서울웨이브아트센터점", view: "한강뷰", address: "잠원한강공원 내 (한강버스 선착장 인근)", menu: ["스타벅스 정규 메뉴"], hours: "평일 08:30~22:00, 주말 07:30~22:00", hotspot: "잠원한강공원 산책로" }
+    ]
+  };
+
+  let __sceneId = 0;
+  function nextId() { return 'sc' + (__sceneId++); }
+
+  function skylineScene() {
+    const id = nextId();
+    return `<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#BFE0F5"/>
+        <stop offset="100%" stop-color="#E9F3F8"/>
+      </linearGradient></defs>
+      <rect width="400" height="140" fill="url(#${id})"/>
+      <circle cx="330" cy="30" r="14" fill="#FFF7DE" opacity="0.9"/>
+      <rect x="8" y="72" width="44" height="68" fill="#3B4E63"/>
+      <rect x="58" y="48" width="34" height="92" fill="#4A5D72"/>
+      <rect x="98" y="86" width="48" height="54" fill="#3B4E63"/>
+      <rect x="286" y="90" width="34" height="50" fill="#3B4E63"/>
+      <rect x="326" y="58" width="40" height="82" fill="#4A5D72"/>
+      <g fill="#DCE9F0">
+        <rect x="16" y="84" width="6" height="6"/><rect x="28" y="96" width="6" height="6"/>
+        <rect x="66" y="62" width="6" height="6"/><rect x="66" y="78" width="6" height="6"/><rect x="66" y="94" width="6" height="6"/>
+        <rect x="110" y="98" width="6" height="6"/><rect x="124" y="112" width="6" height="6"/>
+        <rect x="334" y="74" width="6" height="6"/><rect x="334" y="90" width="6" height="6"/>
+        <rect x="296" y="104" width="6" height="6"/>
+      </g>
+    </svg>`;
   }
-];
 
-const AREA_GROUPS = ["전체", ...Array.from(new Set(CAFES.map(c => c.areaGroup)))];
-const TYPES = ["전체", ...Array.from(new Set(CAFES.map(c => c.type)))];
+  function rooftopScene() {
+    const id = nextId();
+    return `<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#AFC9E8"/>
+        <stop offset="100%" stop-color="#6E86B5"/>
+      </linearGradient></defs>
+      <rect width="400" height="140" fill="url(#${id})"/>
+      <g opacity="0.55" fill="#4A5A82"/>
+      <g opacity="0.55" fill="#4A5A82">
+        <rect x="20" y="55" width="18" height="30"/>
+        <rect x="45" y="45" width="14" height="40"/>
+        <rect x="66" y="60" width="20" height="25"/>
+        <rect x="300" y="50" width="16" height="38"/>
+        <rect x="322" y="62" width="20" height="26"/>
+        <rect x="350" y="42" width="14" height="46"/>
+      </g>
+      <path d="M10 22 Q200 55 390 20" stroke="#3E4E72" stroke-width="2" fill="none" opacity="0.5"/>
+      <g fill="#FFF3D6">
+        <circle cx="60" cy="30" r="3.5"/><circle cx="130" cy="42" r="3.5"/>
+        <circle cx="200" cy="47" r="3.5"/><circle cx="270" cy="40" r="3.5"/>
+        <circle cx="340" cy="28" r="3.5"/>
+      </g>
+      <rect x="0" y="112" width="400" height="28" fill="#2C3450"/>
+      <g fill="#222840">
+        <rect x="16" y="96" width="6" height="16"/><rect x="40" y="96" width="6" height="16"/>
+        <rect x="64" y="96" width="6" height="16"/><rect x="330" y="96" width="6" height="16"/>
+        <rect x="354" y="96" width="6" height="16"/><rect x="378" y="96" width="6" height="16"/>
+      </g>
+      <g transform="translate(110,100)">
+        <rect x="-10" y="6" width="20" height="14" rx="3" fill="#3A4460"/>
+        <path d="M0 6 C -14 -2, -12 -20, 0 -24 C 12 -20, 14 -2, 0 6 Z" fill="#6E8871"/>
+      </g>
+      <g transform="translate(260,100)">
+        <rect x="-9" y="6" width="18" height="14" rx="3" fill="#3A4460"/>
+        <path d="M0 6 C -12 -1, -10 -17, 0 -20 C 10 -17, 12 -1, 0 6 Z" fill="#88A489"/>
+      </g>
+    </svg>`;
+  }
 
-let state = { area: "전체", type: "전체", q: "" };
+  function gardenScene() {
+    return `<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="400" height="140" fill="#DCF0D6"/>
+      <path d="M0 108 Q60 78 120 104 T240 98 T400 106 V140 H0 Z" fill="#7AC46E"/>
+      <path d="M0 124 Q80 98 160 120 T320 116 T400 122 V140 H0 Z" fill="#3E8A42"/>
+      <ellipse cx="86" cy="58" rx="28" ry="32" fill="#5CAE4E"/>
+      <ellipse cx="304" cy="48" rx="24" ry="28" fill="#78C468"/>
+      <ellipse cx="200" cy="70" rx="20" ry="24" fill="#67B658"/>
+      <circle cx="150" cy="38" r="5" fill="#F0B94D" opacity="0.9"/>
+      <circle cx="252" cy="64" r="4" fill="#F0B94D" opacity="0.9"/>
+    </svg>`;
+  }
 
-function renderChips(containerId, items, key){
-  const el = document.getElementById(containerId);
-  el.innerHTML = "";
-  items.forEach(val => {
-    const chip = document.createElement("div");
-    chip.className = "chip" + (state[key] === val ? " active" : "");
-    chip.textContent = val;
-    chip.onclick = () => { state[key] = val; renderChips(containerId, items, key); renderGrid(); };
-    el.appendChild(chip);
-  });
-}
+  function riverScene() {
+    const id = nextId();
+    return `<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#DCEEF2"/>
+        <stop offset="100%" stop-color="#6FA0B0"/>
+      </linearGradient></defs>
+      <rect width="400" height="90" fill="url(#${id})"/>
+      <path d="M0 46 Q100 18 200 46 T400 44" stroke="#2B3B40" stroke-width="6" fill="none" opacity="0.55"/>
+      <rect y="90" width="400" height="50" fill="#6FA0B0"/>
+      <path d="M0 100 Q40 94 80 100 T160 100 T240 100 T320 100 T400 100" stroke="#EAF6F8" stroke-width="2.5" fill="none" opacity="0.55"/>
+      <path d="M0 116 Q40 110 80 116 T160 116 T240 116 T320 116 T400 116" stroke="#EAF6F8" stroke-width="2.5" fill="none" opacity="0.4"/>
+    </svg>`;
+  }
 
-function matches(cafe){
-  const areaOk = state.area === "전체" || cafe.areaGroup === state.area;
-  const typeOk = state.type === "전체" || cafe.type === state.type;
-  const q = state.q.trim().toLowerCase();
-  const qOk = !q || [cafe.name, cafe.area, cafe.type, cafe.desc, cafe.tip, ...cafe.tags]
-    .join(" ").toLowerCase().includes(q);
-  return areaOk && typeOk && qOk;
-}
+  function mountainScene() {
+    return `<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="400" height="140" fill="#CDE8F5"/>
+      <circle cx="320" cy="34" r="16" fill="#FFF7DE"/>
+      <path d="M0 100 L60 40 L110 85 L150 30 L210 95 L260 55 L310 100 L360 60 L400 95 V140 H0 Z" fill="#8FC98A"/>
+      <path d="M0 118 L70 66 L130 105 L180 62 L240 112 L300 74 L360 112 L400 92 V140 H0 Z" fill="#5CA85E"/>
+      <path d="M0 132 L90 96 L150 124 L220 92 L290 128 L400 108 V140 H0 Z" fill="#357A3E"/>
+    </svg>`;
+  }
 
-function renderGrid(){
-  const grid = document.getElementById("grid");
-  const empty = document.getElementById("emptyState");
-  const list = CAFES.filter(matches);
-  document.getElementById("resultCount").textContent = `${list.length}곳의 카페를 찾았어요`;
-  grid.innerHTML = "";
-  empty.style.display = list.length ? "none" : "block";
+  function streetScene() {
+    return `<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="400" height="140" fill="#E3E9ED"/>
+      <rect x="0" y="52" width="130" height="88" fill="#F2F5F7"/>
+      <rect x="140" y="30" width="120" height="110" fill="#DDE5EA"/>
+      <rect x="270" y="60" width="130" height="80" fill="#F2F5F7"/>
+      <rect x="18" y="72" width="34" height="46" fill="#3B4A56"/>
+      <rect x="70" y="80" width="24" height="24" fill="#3B4A56"/>
+      <rect x="160" y="50" width="26" height="26" fill="#3B4A56"/>
+      <rect x="200" y="50" width="26" height="26" fill="#3B4A56"/>
+      <rect x="160" y="90" width="26" height="26" fill="#3B4A56"/>
+      <rect x="200" y="90" width="26" height="26" fill="#3B4A56"/>
+      <rect x="290" y="86" width="30" height="40" fill="#3B4A56"/>
+      <rect x="340" y="94" width="22" height="22" fill="#3B4A56"/>
+      <rect x="0" y="52" width="130" height="8" fill="#6E9C8C"/>
+      <rect x="270" y="60" width="130" height="8" fill="#5C7BA0"/>
+    </svg>`;
+  }
 
-  list.forEach(cafe => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <div class="card-top">
-        <div class="card-emoji">${cafe.emoji}</div>
-        <div>
-          <div class="card-title">${cafe.name}</div>
-          <div class="card-area">${cafe.area} · ${cafe.type}</div>
-        </div>
+  const SCENE_MAP = {
+    "스카이라인뷰": skylineScene, "도심뷰": skylineScene, "테라스뷰": skylineScene,
+    "루프탑뷰": rooftopScene,
+    "정원뷰": gardenScene,
+    "한강뷰": riverScene,
+    "산뷰": mountainScene, "숲뷰": mountainScene, "탁 트인 뷰": mountainScene,
+    "스트릿뷰": streetScene, "창가뷰": streetScene
+  };
+  function sceneFor(viewTag) { return (SCENE_MAP[viewTag] || skylineScene)(); }
+
+  // ---------- 실사 느낌 플레이스홀더 무드 (실제 사진 준비 전 임시) ----------
+  function forestLoungeScene() {
+    const id = nextId();
+    return `<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#BFE39C"/>
+        <stop offset="100%" stop-color="#3E8A4A"/>
+      </linearGradient></defs>
+      <rect width="400" height="140" fill="url(#${id})"/>
+      <!-- 울창한 여름 숲 (겹겹의 나무 캐노피, 채도 높은 그린) -->
+      <g fill="#5CAE4E">
+        <ellipse cx="30" cy="52" rx="46" ry="30"/><ellipse cx="90" cy="40" rx="52" ry="34"/>
+        <ellipse cx="160" cy="50" rx="50" ry="32"/><ellipse cx="230" cy="38" rx="55" ry="36"/>
+        <ellipse cx="300" cy="50" rx="50" ry="32"/><ellipse cx="370" cy="42" rx="48" ry="30"/>
+      </g>
+      <g fill="#2E7A34">
+        <ellipse cx="60" cy="66" rx="40" ry="26"/><ellipse cx="190" cy="70" rx="46" ry="28"/>
+        <ellipse cx="330" cy="66" rx="42" ry="26"/>
+      </g>
+      <g fill="#1F5C28" opacity="0.85">
+        <ellipse cx="120" cy="78" rx="30" ry="18"/><ellipse cx="260" cy="80" rx="34" ry="18"/>
+      </g>
+      <!-- 통유리 창틀 -->
+      <g stroke="#1E1B18" stroke-width="6" opacity="0.85">
+        <line x1="0" y1="8" x2="400" y2="8"/>
+        <line x1="80" y1="0" x2="80" y2="140"/>
+        <line x1="200" y1="0" x2="200" y2="140"/>
+        <line x1="320" y1="0" x2="320" y2="140"/>
+      </g>
+      <!-- 가죽 라운지 체어 (전경) -->
+      <g fill="#211D1A">
+        <path d="M0 140 V96 Q4 84 16 84 H60 Q72 84 76 96 V108 H70 V100 Q68 92 60 92 H16 Q8 92 6 100 V140 Z"/>
+        <rect x="0" y="104" width="76" height="10" rx="4"/>
+      </g>
+      <g fill="#2E2925">
+        <path d="M300 140 V100 Q304 90 314 90 H360 Q370 90 374 100 V112 H368 V104 Q366 98 360 98 H314 Q308 98 306 104 V140 Z"/>
+        <rect x="300" y="108" width="74" height="9" rx="4"/>
+      </g>
+    </svg>`;
+  }
+
+  function sunsetRoofScene() {
+    const id = nextId();
+    return `<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#1B2340"/>
+        <stop offset="60%" stop-color="#141A30"/>
+        <stop offset="100%" stop-color="#0C0F1C"/>
+      </linearGradient></defs>
+      <rect width="400" height="140" fill="url(#${id})"/>
+      <!-- 별 -->
+      <g fill="#E8ECF6" opacity="0.6">
+        <circle cx="40" cy="16" r="1.2"/><circle cx="120" cy="10" r="1"/><circle cx="220" cy="18" r="1.2"/>
+        <circle cx="300" cy="12" r="1"/><circle cx="360" cy="20" r="1.2"/>
+      </g>
+      <!-- 도심 빌딩 스카이라인 (촘촘하고 높은 빌딩들) -->
+      <g fill="#0C0F1C">
+        <rect x="10" y="60" width="26" height="80"/><rect x="40" y="42" width="20" height="98"/>
+        <rect x="64" y="68" width="24" height="72"/><rect x="92" y="30" width="18" height="110"/>
+        <rect x="114" y="56" width="26" height="84"/><rect x="144" y="46" width="20" height="94"/>
+        <rect x="168" y="66" width="24" height="74"/><rect x="196" y="24" width="18" height="116"/>
+        <rect x="218" y="52" width="26" height="88"/><rect x="248" y="40" width="20" height="100"/>
+        <rect x="272" y="64" width="24" height="76"/><rect x="300" y="34" width="18" height="106"/>
+        <rect x="322" y="58" width="26" height="82"/><rect x="352" y="44" width="20" height="96"/>
+        <rect x="376" y="70" width="20" height="70"/>
+      </g>
+      <!-- 창문 불빛 (쿨톤 화이트/시안) -->
+      <g fill="#CFE6F5">
+        <rect x="16" y="72" width="4" height="4"/><rect x="26" y="80" width="4" height="4"/><rect x="16" y="94" width="4" height="4"/>
+        <rect x="46" y="54" width="4" height="4"/><rect x="46" y="70" width="4" height="4"/><rect x="46" y="88" width="4" height="4"/>
+        <rect x="70" y="80" width="4" height="4"/><rect x="70" y="98" width="4" height="4"/>
+        <rect x="98" y="42" width="4" height="4"/><rect x="98" y="60" width="4" height="4"/><rect x="98" y="82" width="4" height="4"/>
+        <rect x="120" y="68" width="4" height="4"/><rect x="120" y="88" width="4" height="4"/>
+        <rect x="150" y="58" width="4" height="4"/><rect x="150" y="76" width="4" height="4"/>
+        <rect x="174" y="78" width="4" height="4"/><rect x="174" y="96" width="4" height="4"/>
+        <rect x="202" y="36" width="4" height="4"/><rect x="202" y="56" width="4" height="4"/><rect x="202" y="80" width="4" height="4"/>
+        <rect x="224" y="64" width="4" height="4"/><rect x="224" y="84" width="4" height="4"/>
+        <rect x="254" y="52" width="4" height="4"/><rect x="254" y="72" width="4" height="4"/>
+        <rect x="278" y="76" width="4" height="4"/><rect x="278" y="94" width="4" height="4"/>
+        <rect x="306" y="46" width="4" height="4"/><rect x="306" y="66" width="4" height="4"/><rect x="306" y="88" width="4" height="4"/>
+        <rect x="328" y="70" width="4" height="4"/><rect x="328" y="90" width="4" height="4"/>
+        <rect x="358" y="56" width="4" height="4"/><rect x="358" y="76" width="4" height="4"/>
+      </g>
+      <!-- 루프탑 난간 -->
+      <rect x="0" y="122" width="400" height="18" fill="#05070D"/>
+      <g stroke="#05070D" stroke-width="4">
+        <line x1="0" y1="112" x2="400" y2="112"/>
+        <line x1="30" y1="112" x2="30" y2="122"/><line x1="90" y1="112" x2="90" y2="122"/>
+        <line x1="150" y1="112" x2="150" y2="122"/><line x1="250" y1="112" x2="250" y2="122"/>
+        <line x1="310" y1="112" x2="310" y2="122"/><line x1="370" y1="112" x2="370" y2="122"/>
+      </g>
+    </svg>`;
+  }
+
+  function riverPlantScene() {
+    const id = nextId();
+    return `<svg viewBox="0 0 400 140" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3FA9F5"/>
+        <stop offset="55%" stop-color="#8FD3F4"/>
+        <stop offset="100%" stop-color="#BFE8EE"/>
+      </linearGradient></defs>
+      <rect width="400" height="140" fill="url(#${id})"/>
+      <!-- 뭉게구름 -->
+      <g fill="#FFFFFF" opacity="0.9">
+        <ellipse cx="60" cy="24" rx="24" ry="10"/><ellipse cx="80" cy="20" rx="18" ry="9"/>
+        <ellipse cx="300" cy="18" rx="26" ry="10"/><ellipse cx="322" cy="24" rx="16" ry="8"/>
+      </g>
+      <!-- 건너편 스카이라인 -->
+      <g fill="#5C8CA6">
+        <rect x="140" y="30" width="14" height="64"/><rect x="158" y="18" width="12" height="76"/>
+        <rect x="174" y="36" width="16" height="58"/><rect x="196" y="24" width="12" height="70"/>
+        <rect x="212" y="40" width="14" height="54"/><rect x="250" y="32" width="14" height="62"/>
+        <rect x="268" y="20" width="12" height="74"/>
+      </g>
+      <!-- 강변 나무줄 -->
+      <ellipse cx="200" cy="98" rx="220" ry="12" fill="#4C9950" opacity="0.9"/>
+      <!-- 강물 + 반짝임 -->
+      <rect x="0" y="100" width="400" height="40" fill="#2E8FC0"/>
+      <path d="M0 112 Q60 108 120 112 T240 112 T360 112 T400 111" stroke="#EAF8FF" stroke-width="2" fill="none" opacity="0.6"/>
+      <path d="M0 124 Q60 120 120 124 T240 124 T360 124 T400 123" stroke="#EAF8FF" stroke-width="2" fill="none" opacity="0.4"/>
+      <!-- 화분 식물 (전경) -->
+      <g fill="#2E6A2A">
+        <path d="M40 140 L36 84 Q34 78 40 76 Q46 78 42 86 L44 140 Z"/>
+        <path d="M52 140 L50 70 Q48 62 56 60 Q62 64 56 72 L58 140 Z"/>
+        <path d="M62 140 L64 88 Q66 82 60 80 Q54 84 58 90 L60 140 Z"/>
+        <path d="M20 140 L26 94 Q28 88 22 86 Q16 90 20 96 L24 140 Z"/>
+      </g>
+      <rect x="10" y="128" width="60" height="18" rx="4" fill="#4C3A2A"/>
+    </svg>`;
+  }
+
+  function hashStr(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+    return h;
+  }
+  const VIEW_TO_PLACEHOLDER = {
+    "창가뷰": forestLoungeScene,
+    "정원뷰": gardenScene,
+    "숲뷰": mountainScene, "산뷰": mountainScene,
+    "스카이라인뷰": sunsetRoofScene,
+    "도심뷰": skylineScene,
+    "스트릿뷰": streetScene,
+    "루프탑뷰": rooftopScene,
+    "테라스뷰": riverScene, "탁 트인 뷰": riverScene,
+    "한강뷰": riverPlantScene
+  };
+  function placeholderScene(cafe) {
+    const fn = VIEW_TO_PLACEHOLDER[cafe.view] || forestLoungeScene;
+    return fn();
+  }
+
+  const VIEW_EMOJI = {
+    "루프탑뷰": "🌇", "스카이라인뷰": "🏙️", "도심뷰": "🏢", "테라스뷰": "☀️",
+    "정원뷰": "🌿", "한강뷰": "🌊", "산뷰": "⛰️", "숲뷰": "🌲", "탁 트인 뷰": "🏞️",
+    "스트릿뷰": "🚶", "창가뷰": "🪟"
+  };
+  function emojiFor(viewTag) { return VIEW_EMOJI[viewTag] || "☕"; }
+
+  const track = document.getElementById('cardsTrack');
+  const dotsWrap = document.getElementById('dotsWrap');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const regionLabel = document.getElementById('regionLabel');
+  const resultCount = document.getElementById('resultCount');
+  const input = document.getElementById('regionInput');
+
+  let currentPage = 0;
+  let totalPages = 1;
+  const PAGE_SIZE = 3;
+
+  function cardHTML(cafe) {
+    const ratingHTML = (cafe.rating !== undefined)
+      ? `<div class="rating"><span class="star">★</span> ${cafe.rating} <span class="review-count">· 리뷰 ${cafe.reviews.toLocaleString()}개</span></div>`
+      : `<div class="rating verified"><span class="verified-badge">✓ 실제 확인된 장소</span></div>`;
+    return `
+      <div class="card-view">
+        ${placeholderScene(cafe)}
+        <span class="tag">${emojiFor(cafe.view)} ${cafe.view}</span>
       </div>
-      <div class="card-desc">${cafe.desc}</div>
-      <div class="tag-row">${cafe.tags.map(t => `<span class="tag">#${t}</span>`).join("")}</div>
-      <div class="card-tip">📸 ${cafe.tip}</div>
+      <div class="card-body">
+        <div class="name">${cafe.name}</div>
+        <div class="addr">📍 ${cafe.address}</div>
+        <div class="meta-row">
+          <span class="mono">${cafe.walk || ""}</span>
+          <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cafe.name + ' ' + cafe.address)}" target="_blank" rel="noopener">지도에서 보기 ↗</a>
+        </div>
+        <div class="menu-row">
+          ${cafe.menu.map(m => `<span class="menu-chip">${m}</span>`).join('')}
+        </div>
+        ${ratingHTML}
+        <div class="hotspot">🧭 <span><b>근처 핫스팟</b> · ${cafe.hotspot}</span></div>
+      </div>
     `;
-    card.onclick = () => openModal(cafe);
-    grid.appendChild(card);
+  }
+
+  function buildPages(list) {
+    track.innerHTML = "";
+    const pages = [];
+    for (let i = 0; i < list.length; i += PAGE_SIZE) pages.push(list.slice(i, i + PAGE_SIZE));
+    totalPages = pages.length;
+
+    pages.forEach(pageItems => {
+      const pageDiv = document.createElement('div');
+      pageDiv.className = 'cards-page';
+      pageItems.forEach((cafe, i) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.animationDelay = (i * 0.08) + 's';
+        card.style.cursor = 'pointer';
+        card.innerHTML = cardHTML(cafe);
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('a.map-link')) return;
+          openModal(cafe);
+        });
+        pageDiv.appendChild(card);
+      });
+      track.appendChild(pageDiv);
+    });
+
+    dotsWrap.innerHTML = "";
+    for (let i = 0; i < totalPages; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', `${i + 1}번째 페이지`);
+      dot.addEventListener('click', () => goToPage(i));
+      dotsWrap.appendChild(dot);
+    }
+    goToPage(0, false);
+  }
+
+  function goToPage(idx, animate = true) {
+    currentPage = Math.max(0, Math.min(idx, totalPages - 1));
+    track.style.transition = animate ? 'transform 0.4s ease' : 'none';
+    track.style.transform = `translateX(-${currentPage * 100}%)`;
+    dotsWrap.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === currentPage));
+    prevBtn.disabled = currentPage === 0;
+    nextBtn.disabled = currentPage === totalPages - 1;
+  }
+
+  function renderCards(region) {
+    const trimmed = (region || "").trim();
+    const cardsWrap = document.getElementById('cardsWrap');
+    const emptyState = document.getElementById('emptyState');
+    const emptyRegion = document.getElementById('emptyRegion');
+    const demoSection = document.getElementById('demoSection');
+    demoSection.style.display = "";
+
+    if (!trimmed) {
+      regionLabel.textContent = "성수동";
+      resultCount.textContent = `${DATA["성수동"].length} RESULTS`;
+      cardsWrap.style.display = "";
+      dotsWrap.style.display = "";
+      emptyState.style.display = "none";
+      buildPages(DATA["성수동"]);
+      return;
+    }
+
+    if (!DATA[trimmed]) {
+      regionLabel.textContent = trimmed;
+      resultCount.textContent = "0 RESULTS";
+      cardsWrap.style.display = "none";
+      dotsWrap.style.display = "none";
+      emptyRegion.textContent = trimmed;
+      emptyState.style.display = "";
+      return;
+    }
+
+    const list = DATA[trimmed];
+    regionLabel.textContent = trimmed;
+    resultCount.textContent = `${list.length} RESULTS`;
+    cardsWrap.style.display = "";
+    dotsWrap.style.display = "";
+    emptyState.style.display = "none";
+    buildPages(list);
+  }
+
+  prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
+  nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
+
+  let touchStartX = 0;
+  const viewport = document.getElementById('cardsViewport');
+  viewport.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  viewport.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 40) goToPage(currentPage + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+
+  // ---------- 카페 상세 모달 ----------
+  const modalOverlay = document.getElementById('cafeModal');
+  const modalContent = document.getElementById('modalContent');
+
+  function openModal(cafe) {
+    const isVerified = (cafe.rating === undefined);
+    const hoursHTML = cafe.hours
+      ? `<div class="modal-row"><span class="modal-label">영업시간</span><span>${cafe.hours}</span></div>`
+      : `<div class="modal-row"><span class="modal-label">영업시간</span><span class="modal-unknown">확인 필요 (지도에서 최신 정보를 확인해주세요)</span></div>`;
+    const closedHTML = cafe.closed
+      ? `<div class="modal-row"><span class="modal-label">휴무일</span><span>${cafe.closed}</span></div>`
+      : `<div class="modal-row"><span class="modal-label">휴무일</span><span class="modal-unknown">확인 필요</span></div>`;
+
+    modalContent.innerHTML = `
+      <div class="modal-scene">${placeholderScene(cafe)}<span class="tag">${emojiFor(cafe.view)} ${cafe.view}</span></div>
+      <div class="modal-body">
+        <div class="modal-title-row">
+          <h3>${cafe.name}</h3>
+          ${isVerified ? '<span class="verified-badge">✓ 실제 확인된 장소</span>' : ''}
+        </div>
+        <div class="modal-row"><span class="modal-label">주소</span><span>📍 ${cafe.address}</span></div>
+        ${hoursHTML}
+        ${closedHTML}
+        <div class="modal-row"><span class="modal-label">메뉴</span><span>${cafe.menu.join(', ')}</span></div>
+        <div class="modal-row"><span class="modal-label">근처 핫스팟</span><span>🧭 ${cafe.hotspot}</span></div>
+        <a class="modal-map-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cafe.name + ' ' + cafe.address)}" target="_blank" rel="noopener">지도에서 보기 ↗</a>
+      </div>
+    `;
+    modalOverlay.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    modalOverlay.style.display = "none";
+    document.body.style.overflow = "";
+  }
+
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) closeModal();
   });
-}
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
-function openModal(cafe){
-  const modal = document.getElementById("modal");
-  modal.innerHTML = `
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-emoji">${cafe.emoji}</div>
-    <h2>${cafe.name}</h2>
-    <span class="card-area">${cafe.area} · ${cafe.type}</span>
-    <div class="tag-row">${cafe.tags.map(t => `<span class="tag">#${t}</span>`).join("")}</div>
-    <div class="modal-section">
-      <h3>분위기</h3>
-      <p>${cafe.desc}</p>
-    </div>
-    <div class="modal-section">
-      <h3>📸 포토 팁</h3>
-      <p>${cafe.tip}</p>
-    </div>
-    <div class="modal-section">
-      <h3>⏰ 추천 방문 시간</h3>
-      <p>${cafe.bestTime}</p>
-    </div>
-  `;
-  document.getElementById("overlay").classList.add("show");
-}
-function closeModal(){ document.getElementById("overlay").classList.remove("show"); }
-document.getElementById("overlay").addEventListener("click", e => {
-  if(e.target.id === "overlay") closeModal();
-});
+  document.getElementById('searchBtn').addEventListener('click', () => {
+    const region = input.value.trim();
+    renderCards(region);
+    document.getElementById('demoSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 
-document.getElementById("search").addEventListener("input", e => {
-  state.q = e.target.value;
-  renderGrid();
-});
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('searchBtn').click();
+  });
 
-renderChips("areaChips", AREA_GROUPS, "area");
-renderChips("typeChips", TYPES, "type");
-renderGrid();
+  document.querySelectorAll('.quick-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+      input.value = tag.dataset.region;
+      renderCards(tag.dataset.region);
+      document.getElementById('demoSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
 </script>
+
 </body>
 </html>
