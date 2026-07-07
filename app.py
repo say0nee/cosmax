@@ -23,4 +23,4 @@ st.markdown(
 HTML_PATH = pathlib.Path(__file__).parent / "caffeineview.html"
 html_content = HTML_PATH.read_text(encoding="utf-8")
 
-components.html(html_content, height=1400, scrolling=True)
+components.html(html_content, height=1550, scrolling=True)
